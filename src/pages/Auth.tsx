@@ -55,25 +55,41 @@ const Auth = () => {
     try {
       if (isSignUp) {
         const { error: signUpError } = await supabase.auth.signUp({
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
           options: {
             data: {
               full_name: formData.fullName,
             },
-            emailRedirectTo: window.location.origin,
+            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
         
-        if (signUpError) throw signUpError;
+        if (signUpError) {
+          console.error("Signup error:", signUpError);
+          if (signUpError.message.includes("email_address_invalid")) {
+            setError("Please enter a valid email address");
+          } else {
+            setError(signUpError.message);
+          }
+          toast.error(signUpError.message);
+          return;
+        }
+        
         toast.success("Registration successful! Please check your email.");
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: formData.email,
+          email: formData.email.trim(),
           password: formData.password,
         });
         
-        if (signInError) throw signInError;
+        if (signInError) {
+          console.error("Signin error:", signInError);
+          setError(signInError.message);
+          toast.error(signInError.message);
+          return;
+        }
+        
         toast.success("Successfully logged in!");
         navigate("/");
       }
