@@ -17,9 +17,18 @@ const Auth = () => {
     fullName: "",
   });
 
+  const validateEmail = (email: string) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
   const validateForm = () => {
     if (!formData.email || !formData.password) {
       setError("Email and password are required");
+      return false;
+    }
+    if (!validateEmail(formData.email)) {
+      setError("Please enter a valid email address");
       return false;
     }
     if (formData.password.length < 6) {
@@ -117,7 +126,7 @@ const Auth = () => {
               placeholder="Email address"
               value={formData.email}
               onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
+                setFormData({ ...formData, email: e.target.value.trim() })
               }
             />
           </div>
