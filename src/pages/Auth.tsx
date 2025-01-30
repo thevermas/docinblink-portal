@@ -54,27 +54,31 @@ const Auth = () => {
 
     try {
       if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
+        const { error: signUpError } = await supabase.auth.signUp({
           email: formData.email,
           password: formData.password,
           options: {
             data: {
               full_name: formData.fullName,
             },
+            emailRedirectTo: window.location.origin,
           },
         });
-        if (error) throw error;
+        
+        if (signUpError) throw signUpError;
         toast.success("Registration successful! Please check your email.");
       } else {
-        const { error } = await supabase.auth.signInWithPassword({
+        const { error: signInError } = await supabase.auth.signInWithPassword({
           email: formData.email,
           password: formData.password,
         });
-        if (error) throw error;
+        
+        if (signInError) throw signInError;
         toast.success("Successfully logged in!");
         navigate("/");
       }
     } catch (error: any) {
+      console.error("Auth error:", error);
       setError(error.message);
       toast.error(error.message);
     } finally {
