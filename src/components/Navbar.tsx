@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const Navbar = () => {
+  const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -14,6 +15,14 @@ const Navbar = () => {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleSignIn = () => {
+    navigate("/auth");
+  };
+
+  const handleBookAppointment = () => {
+    navigate("/book-appointment");
+  };
 
   return (
     <nav
@@ -49,7 +58,7 @@ const Navbar = () => {
               About
             </Link>
             <Link
-              to="/services"
+              to="/#services"
               className="text-gray-700 hover:text-primary transition-colors"
             >
               Services
@@ -63,8 +72,16 @@ const Navbar = () => {
             <Button
               variant="default"
               className="bg-primary hover:bg-primary/90 text-white"
+              onClick={handleSignIn}
             >
               Sign In
+            </Button>
+            <Button
+              variant="outline"
+              className="border-primary text-primary hover:bg-primary hover:text-white"
+              onClick={handleBookAppointment}
+            >
+              Book Appointment
             </Button>
           </div>
 
@@ -100,7 +117,7 @@ const Navbar = () => {
                 About
               </Link>
               <Link
-                to="/services"
+                to="/#services"
                 className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
               >
                 Services
@@ -114,8 +131,16 @@ const Navbar = () => {
               <Button
                 variant="default"
                 className="w-full bg-primary hover:bg-primary/90 text-white mt-4"
+                onClick={handleSignIn}
               >
                 Sign In
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full border-primary text-primary hover:bg-primary hover:text-white mt-2"
+                onClick={handleBookAppointment}
+              >
+                Book Appointment
               </Button>
             </div>
           </div>
