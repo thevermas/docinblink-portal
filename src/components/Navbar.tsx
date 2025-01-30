@@ -117,7 +117,7 @@ const Navbar = () => {
                 About
               </Link>
               <Link
-                to="/#services"
+                to="/services"
                 className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
               >
                 Services
