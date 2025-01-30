@@ -1,41 +1,89 @@
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { motion } from "framer-motion";
 
 const About = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar />
-      <main className="flex-grow py-24">
+      <main className="flex-grow py-24 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h1 className="text-4xl font-bold text-gray-900 mb-4">About DocInBlink</h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Bringing quality healthcare to your doorstep
+          {/* Page Heading */}
+          <motion.div
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut" }}
+            className="text-center mb-12"
+          >
+            <h1 className="text-5xl font-bold text-gray-900 mb-4">About <span className="text-primary">DocInBlink</span></h1>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Bringing quality healthcare to your doorstep.
             </p>
+          </motion.div>
+
+          {/* About Section */}
+          <div className="grid md:grid-cols-2 gap-12 items-center">
+            <motion.div
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <img
+                src="/images/doctor-home-visit.jpg"
+                alt="Doctor visiting home"
+                className="rounded-xl shadow-lg"
+              />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="prose prose-lg"
+            >
+              <p>
+                DocInBlink is a revolutionary healthcare service that brings
+                qualified medical professionals directly to your home. Our mission is to
+                make healthcare accessible, convenient, and efficient for everyone.
+              </p>
+              <h2 className="text-2xl font-semibold text-gray-900 mt-4">Our Mission</h2>
+              <p>
+                We believe that everyone deserves access to quality healthcare without
+                the hassle of traveling when they're unwell. Our team of experienced
+                doctors and medical professionals are available 24/7 to provide care
+                right at your doorstep.
+              </p>
+            </motion.div>
           </div>
-          <div className="prose prose-lg mx-auto">
-            <p>
-              DocInBlink is a revolutionary healthcare service that brings qualified medical
-              professionals directly to your home. Our mission is to make healthcare
-              accessible, convenient, and efficient for everyone.
-            </p>
-            <h2>Our Mission</h2>
-            <p>
-              We believe that everyone deserves access to quality healthcare without the
-              hassle of traveling when they're unwell. Our team of experienced doctors and
-              medical professionals are available 24/7 to provide care right at your
-              doorstep.
-            </p>
-            <h2>Why Choose Us?</h2>
-            <ul>
-              <li>Quick response time (20-30 minutes)</li>
-              <li>Qualified and experienced medical professionals</li>
-              <li>24/7 availability</li>
-              <li>Convenient home visits</li>
-              <li>Digital health records</li>
-              <li>Emergency services</li>
-            </ul>
-          </div>
+
+          {/* Why Choose Us Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.6 }}
+            className="mt-16 text-center"
+          >
+            <h2 className="text-3xl font-bold text-gray-900 mb-6">Why Choose Us?</h2>
+            <div className="grid md:grid-cols-3 gap-6">
+              {[
+                "Quick response time (20-30 minutes)",
+                "Qualified and experienced medical professionals",
+                "24/7 availability",
+                "Convenient home visits",
+                "Digital health records",
+                "Emergency services",
+              ].map((item, index) => (
+                <motion.div
+                  key={index}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.6, delay: 0.2 + index * 0.1 }}
+                  className="bg-white p-6 rounded-xl shadow-md flex items-center justify-center"
+                >
+                  <p className="text-gray-700 text-lg">{item}</p>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </main>
       <Footer />
