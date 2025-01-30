@@ -18,28 +18,23 @@ const About = () => {
           </div>
 
           {/* About Section */}
-          <div className="grid md:grid-cols-2 gap-12 items-center">
-            <div>
-              <img
-                src="/images/doctor-home-visit.jpg"
-                alt="Doctor visiting home"
-                className="rounded-xl shadow-lg"
-              />
-            </div>
-            <div className="prose prose-lg">
-              <p>
-                DocInBlink is a revolutionary healthcare service that brings
-                qualified medical professionals directly to your home. Our mission is to
-                make healthcare accessible, convenient, and efficient for everyone.
-              </p>
-              <h2 className="text-2xl font-semibold text-gray-900 mt-4">Our Mission</h2>
-              <p>
-                We believe that everyone deserves access to quality healthcare without
-                the hassle of traveling when they're unwell. Our team of experienced
-                doctors and medical professionals are available 24/7 to provide care
-                right at your doorstep.
-              </p>
-            </div>
+          <div className="prose prose-lg mx-auto text-center max-w-3xl">
+            <p>
+              <strong>DocInBlink</strong> is a revolutionary healthcare service that brings
+              qualified medical professionals directly to your home. Our mission is to
+              make healthcare accessible, convenient, and efficient for everyone.
+            </p>
+          </div>
+
+          {/* Mission Section */}
+          <div className="text-center mt-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Our Mission</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              We believe that everyone deserves access to quality healthcare without
+              the hassle of traveling when they're unwell. Our team of experienced
+              doctors and medical professionals are available 24/7 to provide care
+              right at your doorstep.
+            </p>
           </div>
 
           {/* Why Choose Us Section */}
