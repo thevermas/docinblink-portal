@@ -18,44 +18,53 @@ const Auth = () => {
   });
 
   const validateEmail = (email: string) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
+    // More strict email validation
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailRegex.test(email.trim());
   };
 
   const validateForm = () => {
-    if (!formData.email || !formData.password) {
+    const trimmedEmail = formData.email.trim();
+    
+    if (!trimmedEmail || !formData.password) {
       setError("Email and password are required");
       return false;
     }
-    if (!validateEmail(formData.email)) {
+    
+    if (!validateEmail(trimmedEmail)) {
       setError("Please enter a valid email address");
       return false;
     }
+    
     if (formData.password.length < 6) {
       setError("Password must be at least 6 characters long");
       return false;
     }
+    
     if (isSignUp && !formData.fullName) {
       setError("Full name is required for registration");
       return false;
     }
+    
     return true;
   };
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-
-    if (!validateForm()) {
-      return;
-    }
-
     setIsLoading(true);
 
     try {
+      if (!validateForm()) {
+        setIsLoading(false);
+        return;
+      }
+
+      const trimmedEmail = formData.email.trim().toLowerCase();
+
       if (isSignUp) {
         const { error: signUpError } = await supabase.auth.signUp({
-          email: formData.email.trim(),
+          email: trimmedEmail,
           password: formData.password,
           options: {
             data: {
@@ -67,26 +76,22 @@ const Auth = () => {
         
         if (signUpError) {
           console.error("Signup error:", signUpError);
-          if (signUpError.message.includes("email_address_invalid")) {
-            setError("Please enter a valid email address");
-          } else {
-            setError(signUpError.message);
-          }
-          toast.error(signUpError.message);
+          setError(signUpError.message);
+          toast.error("Failed to sign up. Please try again.");
           return;
         }
         
         toast.success("Registration successful! Please check your email.");
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
-          email: formData.email.trim(),
+          email: trimmedEmail,
           password: formData.password,
         });
         
         if (signInError) {
           console.error("Signin error:", signInError);
           setError(signInError.message);
-          toast.error(signInError.message);
+          toast.error("Failed to sign in. Please check your credentials.");
           return;
         }
         
@@ -96,7 +101,7 @@ const Auth = () => {
     } catch (error: any) {
       console.error("Auth error:", error);
       setError(error.message);
-      toast.error(error.message);
+      toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setIsLoading(false);
     }
