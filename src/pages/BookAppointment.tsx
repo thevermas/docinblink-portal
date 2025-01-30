@@ -8,19 +8,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
+import type { Database } from "@/integrations/supabase/types";
+
+type AppointmentInsert = Database['public']['Tables']['appointments']['Insert'];
 
 const BookAppointment = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<Omit<AppointmentInsert, 'id' | 'created_at' | 'status' | 'user_id'>>({
     name: "",
     email: "",
     phone: "",
     symptoms: "",
     location: "",
-    needsAmbulance: false,
-    medicalHistory: "",
-    preferredTime: "",
+    needs_ambulance: false,
+    medical_history: "",
+    preferred_time: "",
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,13 +41,15 @@ const BookAppointment = () => {
         return;
       }
 
-      const { error } = await supabase.from("appointments").insert([
-        {
+      const { error } = await supabase
+        .from('appointments')
+        .insert([{
           user_id: user.id,
           ...formData,
-          preferred_time: new Date(formData.preferredTime).toISOString(),
-        },
-      ]);
+          needs_ambulance: formData.needs_ambulance,
+          medical_history: formData.medical_history,
+          preferred_time: new Date(formData.preferred_time).toISOString(),
+        }]);
 
       if (error) throw error;
 
@@ -133,7 +138,7 @@ const BookAppointment = () => {
                 <Textarea
                   id="symptoms"
                   required
-                  value={formData.symptoms}
+                  value={formData.symptoms || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, symptoms: e.target.value })
                   }
@@ -159,9 +164,9 @@ const BookAppointment = () => {
               <div className="flex items-center space-x-2">
                 <Switch
                   id="ambulance"
-                  checked={formData.needsAmbulance}
+                  checked={formData.needs_ambulance || false}
                   onCheckedChange={(checked) =>
-                    setFormData({ ...formData, needsAmbulance: checked })
+                    setFormData({ ...formData, needs_ambulance: checked })
                   }
                 />
                 <label
@@ -180,9 +185,9 @@ const BookAppointment = () => {
                 </label>
                 <Textarea
                   id="medicalHistory"
-                  value={formData.medicalHistory}
+                  value={formData.medical_history || ""}
                   onChange={(e) =>
-                    setFormData({ ...formData, medicalHistory: e.target.value })
+                    setFormData({ ...formData, medical_history: e.target.value })
                   }
                 />
               </div>
@@ -197,9 +202,9 @@ const BookAppointment = () => {
                   id="preferredTime"
                   type="datetime-local"
                   required
-                  value={formData.preferredTime}
+                  value={formData.preferred_time}
                   onChange={(e) =>
-                    setFormData({ ...formData, preferredTime: e.target.value })
+                    setFormData({ ...formData, preferred_time: e.target.value })
                   }
                 />
               </div>
