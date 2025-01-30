@@ -9,6 +9,7 @@ import Contact from "./pages/Contact";
 import Auth from "./pages/Auth";
 import BookAppointment from "./pages/BookAppointment";
 import NotFound from "./pages/NotFound";
+import Services from "./components/Services";
 
 const queryClient = new QueryClient();
 
@@ -21,6 +22,7 @@ const App = () => (
         <Routes>
           <Route path="/" element={<Index />} />
           <Route path="/about" element={<About />} />
+          <Route path="/services" element={<Services />} />
           <Route path="/contact" element={<Contact />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/book-appointment" element={<BookAppointment />} />
