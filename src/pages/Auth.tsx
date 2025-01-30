@@ -4,19 +4,43 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Auth = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [error, setError] = useState("");
   const [formData, setFormData] = useState({
     email: "",
     password: "",
     fullName: "",
   });
 
+  const validateForm = () => {
+    if (!formData.email || !formData.password) {
+      setError("Email and password are required");
+      return false;
+    }
+    if (formData.password.length < 6) {
+      setError("Password must be at least 6 characters long");
+      return false;
+    }
+    if (isSignUp && !formData.fullName) {
+      setError("Full name is required for registration");
+      return false;
+    }
+    return true;
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
     setIsLoading(true);
 
     try {
@@ -42,6 +66,7 @@ const Auth = () => {
         navigate("/");
       }
     } catch (error: any) {
+      setError(error.message);
       toast.error(error.message);
     } finally {
       setIsLoading(false);
@@ -56,6 +81,13 @@ const Auth = () => {
             {isSignUp ? "Create your account" : "Sign in to your account"}
           </h2>
         </div>
+
+        {error && (
+          <Alert variant="destructive">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
         <form className="mt-8 space-y-6" onSubmit={handleAuth}>
           {isSignUp && (
             <div>
@@ -97,7 +129,7 @@ const Auth = () => {
               id="password"
               type="password"
               required
-              placeholder="Password"
+              placeholder="Password (min. 6 characters)"
               value={formData.password}
               onChange={(e) =>
                 setFormData({ ...formData, password: e.target.value })
@@ -121,7 +153,11 @@ const Auth = () => {
         <div className="text-center">
           <button
             type="button"
-            onClick={() => setIsSignUp(!isSignUp)}
+            onClick={() => {
+              setIsSignUp(!isSignUp);
+              setError("");
+              setFormData({ email: "", password: "", fullName: "" });
+            }}
             className="text-primary hover:text-primary/90"
           >
             {isSignUp
