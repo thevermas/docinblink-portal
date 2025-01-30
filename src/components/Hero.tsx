@@ -1,7 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const Hero = () => {
+  const navigate = useNavigate();
+
+  const handleBookAppointment = () => {
+    navigate("/book-appointment");
+  };
+
   return (
     <div className="relative min-h-screen flex items-center justify-center bg-gradient-to-b from-primary-light to-white">
       <div className="absolute inset-0 bg-[url('/placeholder.svg')] opacity-10" />
@@ -21,6 +28,7 @@ const Hero = () => {
         <Button
           size="lg"
           className="animate-fade-in bg-primary hover:bg-primary/90 text-white group"
+          onClick={handleBookAppointment}
         >
           Book Appointment
           <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
