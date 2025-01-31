@@ -31,14 +31,9 @@ const Navbar = () => {
   }, []);
 
   const handleSignOut = async () => {
-    try {
-      await supabase.auth.signOut();
-      setSession(null);
-      setIsMobileMenuOpen(false);
-      navigate("/");
-    } catch (error) {
-      console.error("Error in Navbar signOut:", error);
-    }
+    setSession(null); // Clear session state immediately
+    setIsMobileMenuOpen(false);
+    navigate("/");
   };
 
   return (
