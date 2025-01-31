@@ -11,6 +11,9 @@ export type Database = {
     Tables: {
       appointments: {
         Row: {
+          address1: string
+          address2: string | null
+          city: string
           created_at: string
           email: string
           id: string
@@ -19,12 +22,17 @@ export type Database = {
           name: string
           needs_ambulance: boolean | null
           phone: string
+          pincode: string
           preferred_time: string
+          state: string
           status: string | null
           symptoms: string | null
           user_id: string
         }
         Insert: {
+          address1: string
+          address2?: string | null
+          city: string
           created_at?: string
           email: string
           id?: string
@@ -33,12 +41,17 @@ export type Database = {
           name: string
           needs_ambulance?: boolean | null
           phone: string
+          pincode: string
           preferred_time: string
+          state: string
           status?: string | null
           symptoms?: string | null
           user_id: string
         }
         Update: {
+          address1?: string
+          address2?: string | null
+          city?: string
           created_at?: string
           email?: string
           id?: string
@@ -47,7 +60,9 @@ export type Database = {
           name?: string
           needs_ambulance?: boolean | null
           phone?: string
+          pincode?: string
           preferred_time?: string
+          state?: string
           status?: string | null
           symptoms?: string | null
           user_id?: string
