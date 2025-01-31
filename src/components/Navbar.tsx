@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { Menu, X, User, Heart, Users } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { toast } from "sonner";
+import NavLinks from "./navbar/NavLinks";
+import AuthenticatedMenu from "./navbar/AuthenticatedMenu";
+import UnauthenticatedMenu from "./navbar/UnauthenticatedMenu";
 
 const Navbar = () => {
   const navigate = useNavigate();
@@ -12,9 +13,7 @@ const Navbar = () => {
   const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
+    const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
 
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -31,32 +30,14 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleSignIn = () => {
-    navigate("/auth");
-  };
-
-  const handleSignOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      navigate("/");
-      toast.success("Signed out successfully");
-    } catch (error) {
-      console.error("Error signing out:", error);
-      toast.error("Error signing out");
-    }
-  };
-
-  const handleBookAppointment = () => {
-    navigate("/book-appointment");
+  const handleSignOut = () => {
+    navigate("/");
   };
 
   return (
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled
-          ? "bg-white/80 backdrop-blur-lg shadow-sm"
-          : "bg-transparent"
+        isScrolled ? "bg-white/80 backdrop-blur-lg shadow-sm" : "bg-transparent"
       }`}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -72,78 +53,11 @@ const Navbar = () => {
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center space-x-8">
-            <Link
-              to="/"
-              className="text-gray-700 hover:text-primary transition-colors"
-            >
-              Home
-            </Link>
-            <Link
-              to="/about"
-              className="text-gray-700 hover:text-primary transition-colors"
-            >
-              About
-            </Link>
-            <Link
-              to="/services"
-              className="text-gray-700 hover:text-primary transition-colors"
-            >
-              Services
-            </Link>
-            <Link
-              to="/contact"
-              className="text-gray-700 hover:text-primary transition-colors"
-            >
-              Contact
-            </Link>
+            <NavLinks />
             {session ? (
-              <>
-                <Link
-                  to="/account"
-                  className="text-gray-700 hover:text-primary transition-colors"
-                >
-                  <User className="inline-block mr-1" size={18} />
-                  Account
-                </Link>
-                <Link
-                  to="/medical-records"
-                  className="text-gray-700 hover:text-primary transition-colors"
-                >
-                  <Heart className="inline-block mr-1" size={18} />
-                  Medical Records
-                </Link>
-                <Link
-                  to="/family"
-                  className="text-gray-700 hover:text-primary transition-colors"
-                >
-                  <Users className="inline-block mr-1" size={18} />
-                  My Family
-                </Link>
-                <Button
-                  variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-white"
-                  onClick={handleSignOut}
-                >
-                  Sign Out
-                </Button>
-              </>
+              <AuthenticatedMenu onSignOut={handleSignOut} />
             ) : (
-              <>
-                <Button
-                  variant="default"
-                  className="bg-primary hover:bg-primary/90 text-white"
-                  onClick={handleSignIn}
-                >
-                  Sign In
-                </Button>
-                <Button
-                  variant="outline"
-                  className="border-primary text-primary hover:bg-primary hover:text-white"
-                  onClick={handleBookAppointment}
-                >
-                  Book Appointment
-                </Button>
-              </>
+              <UnauthenticatedMenu />
             )}
           </div>
 
@@ -166,78 +80,11 @@ const Navbar = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden bg-white animate-fade-in">
             <div className="px-2 pt-2 pb-3 space-y-1">
-              <Link
-                to="/"
-                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-              >
-                Home
-              </Link>
-              <Link
-                to="/about"
-                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-              >
-                About
-              </Link>
-              <Link
-                to="/services"
-                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-              >
-                Services
-              </Link>
-              <Link
-                to="/contact"
-                className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-              >
-                Contact
-              </Link>
+              <NavLinks isMobile />
               {session ? (
-                <>
-                  <Link
-                    to="/account"
-                    className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-                  >
-                    <User className="inline-block mr-2" size={18} />
-                    Account
-                  </Link>
-                  <Link
-                    to="/medical-records"
-                    className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-                  >
-                    <Heart className="inline-block mr-2" size={18} />
-                    Medical Records
-                  </Link>
-                  <Link
-                    to="/family"
-                    className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
-                  >
-                    <Users className="inline-block mr-2" size={18} />
-                    My Family
-                  </Link>
-                  <Button
-                    variant="outline"
-                    className="w-full border-primary text-primary hover:bg-primary hover:text-white mt-2"
-                    onClick={handleSignOut}
-                  >
-                    Sign Out
-                  </Button>
-                </>
+                <AuthenticatedMenu onSignOut={handleSignOut} isMobile />
               ) : (
-                <>
-                  <Button
-                    variant="default"
-                    className="w-full bg-primary hover:bg-primary/90 text-white mt-4"
-                    onClick={handleSignIn}
-                  >
-                    Sign In
-                  </Button>
-                  <Button
-                    variant="outline"
-                    className="w-full border-primary text-primary hover:bg-primary hover:text-white mt-2"
-                    onClick={handleBookAppointment}
-                  >
-                    Book Appointment
-                  </Button>
-                </>
+                <UnauthenticatedMenu isMobile />
               )}
             </div>
           </div>
