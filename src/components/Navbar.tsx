@@ -50,7 +50,6 @@ const Navbar = () => {
                 alt="DocInBlink Logo"
                 className="h-8 w-auto mr-2"
               />
-              DocInBlink
             </Link>
           </div>
 
