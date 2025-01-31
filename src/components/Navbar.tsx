@@ -42,11 +42,14 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          <div className="flex-shrink-0">
-            <Link
-              to="/"
-              className="text-2xl font-bold text-primary animate-fade-in"
-            >
+          {/* Logo and Company Name */}
+          <div className="flex-shrink-0 flex items-center">
+            <Link to="/" className="text-2xl font-bold text-primary animate-fade-in flex items-center">
+              <img
+                src="/lovable-uploads/961492f6-6f5c-4df0-ab56-ff34ba4ed973.png"
+                alt="DocInBlink Logo"
+                className="h-8 w-auto mr-2"
+              />
               DocInBlink
             </Link>
           </div>
