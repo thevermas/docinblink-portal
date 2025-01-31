@@ -69,6 +69,80 @@ export type Database = {
         }
         Relationships: []
       }
+      family_members: {
+        Row: {
+          allergies: string | null
+          created_at: string
+          date_of_birth: string | null
+          health_issues: string | null
+          id: string
+          name: string
+          relationship: string
+          user_id: string
+        }
+        Insert: {
+          allergies?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          health_issues?: string | null
+          id?: string
+          name: string
+          relationship: string
+          user_id: string
+        }
+        Update: {
+          allergies?: string | null
+          created_at?: string
+          date_of_birth?: string | null
+          health_issues?: string | null
+          id?: string
+          name?: string
+          relationship?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      medical_records: {
+        Row: {
+          created_at: string
+          description: string | null
+          doctor_name: string | null
+          file_url: string | null
+          id: string
+          patient_id: string
+          record_date: string
+          record_type: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          doctor_name?: string | null
+          file_url?: string | null
+          id?: string
+          patient_id: string
+          record_date?: string
+          record_type: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          doctor_name?: string | null
+          file_url?: string | null
+          id?: string
+          patient_id?: string
+          record_date?: string
+          record_type?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fk_patient"
+            columns: ["patient_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string

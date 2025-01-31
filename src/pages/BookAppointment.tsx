@@ -25,6 +25,11 @@ const BookAppointment = () => {
     needs_ambulance: false,
     medical_history: "",
     preferred_time: "",
+    address1: "",
+    address2: "",
+    city: "",
+    state: "",
+    pincode: "",
   });
 
   const handleAddressChange = (addressData: {
@@ -34,8 +39,15 @@ const BookAppointment = () => {
     city: string;
     state: string;
   }) => {
-    const fullAddress = `${addressData.address1}${addressData.address2 ? ', ' + addressData.address2 : ''}, ${addressData.city}, ${addressData.state} - ${addressData.pincode}`;
-    setFormData({ ...formData, location: fullAddress });
+    setFormData(prev => ({
+      ...prev,
+      address1: addressData.address1,
+      address2: addressData.address2,
+      pincode: addressData.pincode,
+      city: addressData.city,
+      state: addressData.state,
+      location: `${addressData.address1}${addressData.address2 ? ', ' + addressData.address2 : ''}, ${addressData.city}, ${addressData.state} - ${addressData.pincode}`
+    }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
