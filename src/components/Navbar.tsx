@@ -30,8 +30,15 @@ const Navbar = () => {
     };
   }, []);
 
-  const handleSignOut = () => {
-    navigate("/");
+  const handleSignOut = async () => {
+    try {
+      await supabase.auth.signOut();
+      setSession(null);
+      setIsMobileMenuOpen(false);
+      navigate("/");
+    } catch (error) {
+      console.error("Error in Navbar signOut:", error);
+    }
   };
 
   return (

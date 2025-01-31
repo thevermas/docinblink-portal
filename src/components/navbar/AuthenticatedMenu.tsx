@@ -12,30 +12,19 @@ interface AuthenticatedMenuProps {
 const AuthenticatedMenu = ({ onSignOut, isMobile = false }: AuthenticatedMenuProps) => {
   const handleSignOut = async () => {
     try {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        toast.error("No active session found");
-        onSignOut();
-        return;
-      }
-
       const { error } = await supabase.auth.signOut();
-      
       if (error) {
         console.error("Error signing out:", error);
         if (error.message.includes("session_not_found")) {
           // If session not found, still trigger sign out UI update
-          toast.success("Signed out successfully");
           onSignOut();
           return;
         }
         toast.error("Error signing out");
         return;
       }
-
-      toast.success("Signed out successfully");
       onSignOut();
+      toast.success("Signed out successfully");
     } catch (error) {
       console.error("Error in sign out process:", error);
       toast.error("An unexpected error occurred");
