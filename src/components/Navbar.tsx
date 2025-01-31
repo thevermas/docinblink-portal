@@ -1,23 +1,50 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, Heart, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link, useNavigate } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [session, setSession] = useState<any>(null);
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleSignIn = () => {
     navigate("/auth");
+  };
+
+  const handleSignOut = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      navigate("/");
+      toast.success("Signed out successfully");
+    } catch (error) {
+      console.error("Error signing out:", error);
+      toast.error("Error signing out");
+    }
   };
 
   const handleBookAppointment = () => {
@@ -69,20 +96,55 @@ const Navbar = () => {
             >
               Contact
             </Link>
-            <Button
-              variant="default"
-              className="bg-primary hover:bg-primary/90 text-white"
-              onClick={handleSignIn}
-            >
-              Sign In
-            </Button>
-            <Button
-              variant="outline"
-              className="border-primary text-primary hover:bg-primary hover:text-white"
-              onClick={handleBookAppointment}
-            >
-              Book Appointment
-            </Button>
+            {session ? (
+              <>
+                <Link
+                  to="/account"
+                  className="text-gray-700 hover:text-primary transition-colors"
+                >
+                  <User className="inline-block mr-1" size={18} />
+                  Account
+                </Link>
+                <Link
+                  to="/medical-records"
+                  className="text-gray-700 hover:text-primary transition-colors"
+                >
+                  <Heart className="inline-block mr-1" size={18} />
+                  Medical Records
+                </Link>
+                <Link
+                  to="/family"
+                  className="text-gray-700 hover:text-primary transition-colors"
+                >
+                  <Users className="inline-block mr-1" size={18} />
+                  My Family
+                </Link>
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary hover:text-white"
+                  onClick={handleSignOut}
+                >
+                  Sign Out
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  variant="default"
+                  className="bg-primary hover:bg-primary/90 text-white"
+                  onClick={handleSignIn}
+                >
+                  Sign In
+                </Button>
+                <Button
+                  variant="outline"
+                  className="border-primary text-primary hover:bg-primary hover:text-white"
+                  onClick={handleBookAppointment}
+                >
+                  Book Appointment
+                </Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -128,20 +190,55 @@ const Navbar = () => {
               >
                 Contact
               </Link>
-              <Button
-                variant="default"
-                className="w-full bg-primary hover:bg-primary/90 text-white mt-4"
-                onClick={handleSignIn}
-              >
-                Sign In
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full border-primary text-primary hover:bg-primary hover:text-white mt-2"
-                onClick={handleBookAppointment}
-              >
-                Book Appointment
-              </Button>
+              {session ? (
+                <>
+                  <Link
+                    to="/account"
+                    className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
+                  >
+                    <User className="inline-block mr-2" size={18} />
+                    Account
+                  </Link>
+                  <Link
+                    to="/medical-records"
+                    className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
+                  >
+                    <Heart className="inline-block mr-2" size={18} />
+                    Medical Records
+                  </Link>
+                  <Link
+                    to="/family"
+                    className="block px-3 py-2 text-gray-700 hover:text-primary transition-colors"
+                  >
+                    <Users className="inline-block mr-2" size={18} />
+                    My Family
+                  </Link>
+                  <Button
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary hover:text-white mt-2"
+                    onClick={handleSignOut}
+                  >
+                    Sign Out
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button
+                    variant="default"
+                    className="w-full bg-primary hover:bg-primary/90 text-white mt-4"
+                    onClick={handleSignIn}
+                  >
+                    Sign In
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full border-primary text-primary hover:bg-primary hover:text-white mt-2"
+                    onClick={handleBookAppointment}
+                  >
+                    Book Appointment
+                  </Button>
+                </>
+              )}
             </div>
           </div>
         )}
