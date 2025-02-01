@@ -15,7 +15,9 @@ export type Database = {
           address2: string | null
           city: string
           created_at: string
+          doctor_id: string | null
           email: string
+          fee: number | null
           id: string
           location: string
           medical_history: string | null
@@ -34,7 +36,9 @@ export type Database = {
           address2?: string | null
           city: string
           created_at?: string
+          doctor_id?: string | null
           email: string
+          fee?: number | null
           id?: string
           location: string
           medical_history?: string | null
@@ -53,7 +57,9 @@ export type Database = {
           address2?: string | null
           city?: string
           created_at?: string
+          doctor_id?: string | null
           email?: string
+          fee?: number | null
           id?: string
           location?: string
           medical_history?: string | null
@@ -65,6 +71,85 @@ export type Database = {
           state?: string
           status?: string | null
           symptoms?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctor_availability: {
+        Row: {
+          created_at: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id: string
+          start_time: string
+        }
+        Insert: {
+          created_at?: string
+          day_of_week: number
+          doctor_id: string
+          end_time: string
+          id?: string
+          start_time: string
+        }
+        Update: {
+          created_at?: string
+          day_of_week?: number
+          doctor_id?: string
+          end_time?: string
+          id?: string
+          start_time?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_availability_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          consultation_fee: number | null
+          created_at: string
+          experience_years: number | null
+          full_name: string
+          id: string
+          is_available: boolean | null
+          qualification: string | null
+          specialization: string | null
+          user_id: string
+        }
+        Insert: {
+          consultation_fee?: number | null
+          created_at?: string
+          experience_years?: number | null
+          full_name: string
+          id?: string
+          is_available?: boolean | null
+          qualification?: string | null
+          specialization?: string | null
+          user_id: string
+        }
+        Update: {
+          consultation_fee?: number | null
+          created_at?: string
+          experience_years?: number | null
+          full_name?: string
+          id?: string
+          is_available?: boolean | null
+          qualification?: string | null
+          specialization?: string | null
           user_id?: string
         }
         Relationships: []
@@ -169,7 +254,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      is_doctor: {
+        Args: {
+          user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never

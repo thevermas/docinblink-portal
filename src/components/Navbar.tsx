@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Menu, X, User, Heart, Users } from "lucide-react";
+import { Menu, X, User, Heart, Users, Stethoscope } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import NavLinks from "./navbar/NavLinks";
@@ -138,6 +138,13 @@ const Navbar = () => {
                   Sign In
                 </Link>
                 <Link
+                  to="/doctor-auth"
+                  className="flex items-center space-x-1 text-primary hover:text-primary/90 transition-colors"
+                >
+                  <Stethoscope className="h-4 w-4" />
+                  <span>Doctor Sign In</span>
+                </Link>
+                <Link
                   to="/book-appointment"
                   className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
                 >
@@ -196,6 +203,14 @@ const Navbar = () => {
                     onClick={() => setIsMobileMenuOpen(false)}
                   >
                     Sign In
+                  </Link>
+                  <Link
+                    to="/doctor-auth"
+                    className="block w-full text-center bg-white text-primary border border-primary px-4 py-2 rounded-md hover:bg-primary/5 transition-colors flex items-center justify-center space-x-1"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Stethoscope className="h-4 w-4" />
+                    <span>Doctor Sign In</span>
                   </Link>
                   <Link
                     to="/book-appointment"
