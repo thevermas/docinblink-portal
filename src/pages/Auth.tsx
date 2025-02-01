@@ -62,14 +62,13 @@ const Auth = () => {
       const trimmedEmail = formData.email.trim().toLowerCase();
 
       if (isSignUp) {
-        const { error: signUpError } = await supabase.auth.signUp({
+        const { data, error: signUpError } = await supabase.auth.signUp({
           email: trimmedEmail,
           password: formData.password,
           options: {
             data: {
               full_name: formData.fullName,
             },
-            emailRedirectTo: `${window.location.origin}/auth/callback`,
           },
         });
         
@@ -79,8 +78,12 @@ const Auth = () => {
           toast.error("Failed to sign up. Please try again.");
           return;
         }
-        
-        toast.success("Registration successful! Please check your email.");
+
+        if (data?.user) {
+          toast.success("Registration successful! You can now sign in.");
+          setIsSignUp(false);
+          setFormData({ email: trimmedEmail, password: "", fullName: "" });
+        }
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
@@ -94,6 +97,7 @@ const Auth = () => {
           return;
         }
         
+        toast.success("Successfully signed in!");
         navigate("/");
       }
     } catch (error: any) {
