@@ -28,15 +28,16 @@ const MedicalRecordForm = ({ patientId, onSuccess }: MedicalRecordFormProps) => 
     const formData = new FormData(e.currentTarget);
     const record = {
       patient_id: patientId,
-      record_type: formData.get("recordType"),
-      doctor_name: formData.get("doctorName"),
-      description: formData.get("description"),
+      record_type: String(formData.get("recordType")),
+      doctor_name: String(formData.get("doctorName")),
+      description: String(formData.get("description")),
+      record_date: new Date().toISOString()
     };
 
     try {
       const { error } = await supabase
         .from("medical_records")
-        .insert([record]);
+        .insert(record);
 
       if (error) throw error;
 
