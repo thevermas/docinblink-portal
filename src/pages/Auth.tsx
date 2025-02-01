@@ -18,7 +18,6 @@ const Auth = () => {
   });
 
   const validateEmail = (email: string) => {
-    // More strict email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     return emailRegex.test(email.trim());
   };
@@ -95,7 +94,6 @@ const Auth = () => {
           return;
         }
         
-        toast.success("Successfully logged in!");
         navigate("/");
       }
     } catch (error: any) {
@@ -110,8 +108,13 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        <div className="flex flex-col items-center">
+          <img
+            src="/lovable-uploads/961492f6-6f5c-4df0-ab56-ff34ba4ed973.png"
+            alt="DocInBlink Logo"
+            className="h-12 w-auto mb-6"
+          />
+          <h2 className="text-center text-3xl font-extrabold text-gray-900">
             {isSignUp ? "Create your account" : "Sign in to your account"}
           </h2>
         </div>
@@ -173,7 +176,7 @@ const Auth = () => {
           <div>
             <Button
               type="submit"
-              className="w-full"
+              className="w-full bg-primary hover:bg-primary/90 text-white"
               disabled={isLoading}
             >
               {isLoading

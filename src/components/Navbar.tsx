@@ -1,27 +1,60 @@
 import { useState, useEffect } from "react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, User, Heart, Users } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import NavLinks from "./navbar/NavLinks";
-import AuthenticatedMenu from "./navbar/AuthenticatedMenu";
-import UnauthenticatedMenu from "./navbar/UnauthenticatedMenu";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const navigate = useNavigate();
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [session, setSession] = useState<any>(null);
+  const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
 
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-    });
+    const setupAuth = async () => {
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      setSession(currentSession);
+      
+      if (currentSession?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', currentSession.user.id)
+          .single();
+        
+        if (profile?.full_name) {
+          setUserName(profile.full_name);
+          toast.success(`Hi ${profile.full_name}, Welcome to DocInBlink!`);
+        }
+      }
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    setupAuth();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setSession(session);
+      if (session?.user) {
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('full_name')
+          .eq('id', session.user.id)
+          .single();
+        
+        if (profile?.full_name) {
+          setUserName(profile.full_name);
+        }
+      }
     });
 
     return () => {
@@ -31,10 +64,23 @@ const Navbar = () => {
   }, []);
 
   const handleSignOut = async () => {
-    setSession(null); // Clear session state immediately
-    setIsMobileMenuOpen(false);
-    navigate("/");
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setSession(null);
+      setIsMobileMenuOpen(false);
+      setUserName("");
+      navigate("/");
+    } catch (error) {
+      console.error("Error in Navbar signOut:", error);
+    }
   };
+
+  const menuItems = [
+    { to: "/account", icon: User, text: "Account" },
+    { to: "/medical-records", icon: Heart, text: "Medical Records" },
+    { to: "/family", icon: Users, text: "My Family" },
+  ];
 
   return (
     <nav
@@ -44,7 +90,7 @@ const Navbar = () => {
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo and Company Name */}
+          {/* Logo */}
           <div className="flex-shrink-0 flex items-center">
             <Link to="/" className="text-2xl font-bold text-primary animate-fade-in flex items-center">
               <img
@@ -55,13 +101,49 @@ const Navbar = () => {
             </Link>
           </div>
 
-          {/* Desktop Menu */}
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             <NavLinks />
             {session ? (
-              <AuthenticatedMenu onSignOut={handleSignOut} />
+              <div className="flex items-center space-x-4">
+                <span className="text-primary font-medium">Hi, {userName}</span>
+                <DropdownMenu>
+                  <DropdownMenuTrigger className="outline-none">
+                    <Menu className="h-6 w-6 text-primary hover:text-primary/90 transition-colors" />
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56">
+                    {menuItems.map(({ to, icon: Icon, text }) => (
+                      <DropdownMenuItem key={to} asChild>
+                        <Link to={to} className="flex items-center space-x-2">
+                          <Icon className="h-4 w-4" />
+                          <span>{text}</span>
+                        </Link>
+                      </DropdownMenuItem>
+                    ))}
+                    <DropdownMenuItem
+                      className="text-red-600 focus:text-red-600"
+                      onClick={handleSignOut}
+                    >
+                      Sign Out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
             ) : (
-              <UnauthenticatedMenu />
+              <div className="flex items-center space-x-4">
+                <Link
+                  to="/auth"
+                  className="text-primary hover:text-primary/90 transition-colors"
+                >
+                  Sign In
+                </Link>
+                <Link
+                  to="/book-appointment"
+                  className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                >
+                  Book Appointment
+                </Link>
+              </div>
             )}
           </div>
 
@@ -69,7 +151,7 @@ const Navbar = () => {
           <div className="md:hidden">
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="text-gray-700 hover:text-primary transition-colors"
+              className="text-primary hover:text-primary/90 transition-colors"
             >
               {isMobileMenuOpen ? (
                 <X className="h-6 w-6" />
@@ -86,9 +168,43 @@ const Navbar = () => {
             <div className="px-2 pt-2 pb-3 space-y-1">
               <NavLinks isMobile />
               {session ? (
-                <AuthenticatedMenu onSignOut={handleSignOut} isMobile />
+                <>
+                  <div className="px-3 py-2 text-primary font-medium">Hi, {userName}</div>
+                  {menuItems.map(({ to, icon: Icon, text }) => (
+                    <Link
+                      key={to}
+                      to={to}
+                      className="flex items-center space-x-2 px-3 py-2 text-gray-700 hover:text-primary transition-colors"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      <Icon className="h-4 w-4" />
+                      <span>{text}</span>
+                    </Link>
+                  ))}
+                  <button
+                    onClick={handleSignOut}
+                    className="w-full text-left px-3 py-2 text-red-600 hover:text-red-700 transition-colors"
+                  >
+                    Sign Out
+                  </button>
+                </>
               ) : (
-                <UnauthenticatedMenu isMobile />
+                <div className="space-y-2 p-2">
+                  <Link
+                    to="/auth"
+                    className="block w-full text-center bg-white text-primary border border-primary px-4 py-2 rounded-md hover:bg-primary/5 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Sign In
+                  </Link>
+                  <Link
+                    to="/book-appointment"
+                    className="block w-full text-center bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 transition-colors"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    Book Appointment
+                  </Link>
+                </div>
               )}
             </div>
           </div>
