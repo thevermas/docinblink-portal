@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Stethoscope } from "lucide-react";
+import type { AuthError } from "@supabase/supabase-js";
 
 const DoctorAuth = () => {
   const navigate = useNavigate();
@@ -23,8 +24,22 @@ const DoctorAuth = () => {
   });
 
   const validateEmail = (email: string) => {
+    // More strict email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return emailRegex.test(email.trim());
+    const trimmedEmail = email.trim().toLowerCase();
+    
+    if (!emailRegex.test(trimmedEmail)) {
+      return false;
+    }
+    
+    // Additional checks for common test emails
+    const invalidTestDomains = ['test.com', 'example.com'];
+    const domain = trimmedEmail.split('@')[1];
+    if (invalidTestDomains.includes(domain)) {
+      return false;
+    }
+    
+    return true;
   };
 
   const validateForm = () => {
@@ -36,7 +51,7 @@ const DoctorAuth = () => {
     }
     
     if (!validateEmail(trimmedEmail)) {
-      setError("Please enter a valid email address");
+      setError("Please enter a valid email address. Test emails are not allowed.");
       return false;
     }
     
@@ -65,6 +80,28 @@ const DoctorAuth = () => {
     return true;
   };
 
+  const handleAuthError = (error: AuthError) => {
+    console.error("Auth error:", error);
+    
+    // Handle specific Supabase error codes
+    switch (error.message) {
+      case "Email address is invalid":
+      case "Email address invalid":
+        setError("Please enter a valid email address. Test emails are not allowed.");
+        break;
+      case "User already registered":
+        setError("An account with this email already exists. Please sign in instead.");
+        break;
+      case "Invalid login credentials":
+        setError("Invalid email or password. Please try again.");
+        break;
+      default:
+        setError(error.message || "An unexpected error occurred. Please try again.");
+    }
+    
+    toast.error("Authentication failed. Please check your details.");
+  };
+
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
@@ -91,9 +128,8 @@ const DoctorAuth = () => {
         });
         
         if (signUpError) {
-          console.error("Signup error:", signUpError);
-          setError(signUpError.message);
-          toast.error("Failed to sign up. Please try again.");
+          handleAuthError(signUpError);
+          setIsLoading(false);
           return;
         }
 
@@ -124,9 +160,8 @@ const DoctorAuth = () => {
         });
         
         if (signInError) {
-          console.error("Signin error:", signInError);
-          setError(signInError.message);
-          toast.error("Failed to sign in. Please check your credentials.");
+          handleAuthError(signInError);
+          setIsLoading(false);
           return;
         }
         
@@ -145,12 +180,11 @@ const DoctorAuth = () => {
           return;
         }
         
+        toast.success("Successfully signed in!");
         navigate("/doctor-dashboard");
       }
     } catch (error: any) {
-      console.error("Auth error:", error);
-      setError(error.message);
-      toast.error("An unexpected error occurred. Please try again.");
+      handleAuthError(error);
     } finally {
       setIsLoading(false);
     }
