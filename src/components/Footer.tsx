@@ -42,6 +42,14 @@ const Footer = () => {
                   Contact
                 </Link>
               </li>
+              <li>
+                <Link
+                  to="/doctor-auth"
+                  className="text-gray-600 hover:text-primary transition-colors"
+                >
+                  Doctor Portal
+                </Link>
+              </li>
             </ul>
           </div>
           <div>

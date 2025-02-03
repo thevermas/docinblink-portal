@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -21,10 +21,46 @@ interface Appointment {
   status: string;
   symptoms: string | null;
   fee: number | null;
+  user_id: string;
 }
 
-const AppointmentList = () => {
+interface AppointmentListProps {
+  onPatientSelect?: (patientId: string) => void;
+}
+
+const AppointmentList = ({ onPatientSelect }: AppointmentListProps) => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
+
+  const fetchAppointments = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: doctorData } = await supabase
+        .from("doctors")
+        .select("id")
+        .eq("user_id", user.id)
+        .single();
+
+      if (!doctorData) return;
+
+      const { data, error } = await supabase
+        .from("appointments")
+        .select("*")
+        .eq("doctor_id", doctorData.id)
+        .order("preferred_time", { ascending: true });
+
+      if (error) throw error;
+      setAppointments(data || []);
+    } catch (error: any) {
+      toast.error("Failed to fetch appointments");
+    }
+  };
 
   const updateAppointmentStatus = async (id: string, status: string) => {
     try {
@@ -45,6 +81,11 @@ const AppointmentList = () => {
     }
   };
 
+  const handleAppointmentClick = (appointment: Appointment) => {
+    setSelectedAppointmentId(appointment.id);
+    onPatientSelect?.(appointment.user_id);
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -54,7 +95,13 @@ const AppointmentList = () => {
       <CardContent>
         <div className="space-y-4">
           {appointments.map((appointment) => (
-            <Card key={appointment.id}>
+            <Card 
+              key={appointment.id}
+              className={`cursor-pointer transition-colors ${
+                selectedAppointmentId === appointment.id ? 'ring-2 ring-primary' : ''
+              }`}
+              onClick={() => handleAppointmentClick(appointment)}
+            >
               <CardContent className="p-4">
                 <div className="flex items-start justify-between">
                   <div>
@@ -81,18 +128,20 @@ const AppointmentList = () => {
                         <Button
                           variant="default"
                           size="sm"
-                          onClick={() =>
-                            updateAppointmentStatus(appointment.id, "accepted")
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateAppointmentStatus(appointment.id, "accepted");
+                          }}
                         >
                           Accept
                         </Button>
                         <Button
                           variant="destructive"
                           size="sm"
-                          onClick={() =>
-                            updateAppointmentStatus(appointment.id, "rejected")
-                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            updateAppointmentStatus(appointment.id, "rejected");
+                          }}
                         >
                           Reject
                         </Button>

@@ -118,6 +118,41 @@ export type Database = {
           },
         ]
       }
+      doctor_feedback: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          id: string
+          message: string
+          patient_id: string
+          read_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          id?: string
+          message: string
+          patient_id: string
+          read_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          message?: string
+          patient_id?: string
+          read_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_feedback_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       doctors: {
         Row: {
           consultation_fee: number | null
@@ -224,6 +259,53 @@ export type Database = {
             columns: ["patient_id"]
             isOneToOne: false
             referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      prescriptions: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          dosage: string
+          duration: string
+          frequency: string
+          id: string
+          medication_name: string
+          notes: string | null
+          patient_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          dosage: string
+          duration: string
+          frequency: string
+          id?: string
+          medication_name: string
+          notes?: string | null
+          patient_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          dosage?: string
+          duration?: string
+          frequency?: string
+          id?: string
+          medication_name?: string
+          notes?: string | null
+          patient_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prescriptions_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
             referencedColumns: ["id"]
           },
         ]

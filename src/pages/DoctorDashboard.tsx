@@ -5,11 +5,15 @@ import { toast } from "sonner";
 import DoctorStats from "@/components/doctor/DoctorStats";
 import AppointmentList from "@/components/doctor/AppointmentList";
 import AvailabilityManager from "@/components/doctor/AvailabilityManager";
+import PrescriptionManager from "@/components/doctor/PrescriptionManager";
+import FeedbackSender from "@/components/doctor/FeedbackSender";
 import { ResizablePanelGroup, ResizablePanel } from "@/components/ui/resizable";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const DoctorDashboard = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedPatientId, setSelectedPatientId] = useState<string | null>(null);
 
   useEffect(() => {
     const checkDoctorStatus = async () => {
@@ -40,6 +44,10 @@ const DoctorDashboard = () => {
     checkDoctorStatus();
   }, [navigate]);
 
+  const handlePatientSelect = (patientId: string) => {
+    setSelectedPatientId(patientId);
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -61,12 +69,27 @@ const DoctorDashboard = () => {
         >
           <ResizablePanel defaultSize={65}>
             <div className="p-4">
-              <AppointmentList />
+              <AppointmentList onPatientSelect={handlePatientSelect} />
             </div>
           </ResizablePanel>
           <ResizablePanel defaultSize={35}>
-            <div className="p-4">
+            <div className="p-4 space-y-4">
               <AvailabilityManager />
+              
+              {selectedPatientId && (
+                <Tabs defaultValue="prescriptions">
+                  <TabsList className="w-full">
+                    <TabsTrigger value="prescriptions" className="flex-1">Prescriptions</TabsTrigger>
+                    <TabsTrigger value="feedback" className="flex-1">Feedback</TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="prescriptions">
+                    <PrescriptionManager patientId={selectedPatientId} />
+                  </TabsContent>
+                  <TabsContent value="feedback">
+                    <FeedbackSender patientId={selectedPatientId} />
+                  </TabsContent>
+                </Tabs>
+              )}
             </div>
           </ResizablePanel>
         </ResizablePanelGroup>
