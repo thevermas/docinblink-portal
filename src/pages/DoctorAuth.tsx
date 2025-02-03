@@ -13,6 +13,7 @@ const DoctorAuth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [error, setError] = useState("");
+  const [lastSignupAttempt, setLastSignupAttempt] = useState(0);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -75,6 +76,13 @@ const DoctorAuth = () => {
         setError("Please enter valid consultation fee");
         return false;
       }
+
+      // Check rate limit for signup
+      const now = Date.now();
+      if (now - lastSignupAttempt < 7000) { // 7 seconds cooldown
+        setError("Please wait a few seconds before trying to sign up again");
+        return false;
+      }
     }
     
     return true;
@@ -84,6 +92,11 @@ const DoctorAuth = () => {
     console.error("Auth error:", error);
     
     // Handle specific Supabase error codes
+    if (error.status === 429) {
+      setError("Too many attempts. Please wait a few seconds before trying again.");
+      return;
+    }
+
     switch (error.message) {
       case "Email address is invalid":
       case "Email address invalid":
@@ -94,6 +107,9 @@ const DoctorAuth = () => {
         break;
       case "Invalid login credentials":
         setError("Invalid email or password. Please try again.");
+        break;
+      case "For security purposes, you can only request this after 7 seconds.":
+        setError("Please wait 7 seconds before trying again.");
         break;
       default:
         setError(error.message || "An unexpected error occurred. Please try again.");
@@ -116,6 +132,7 @@ const DoctorAuth = () => {
       const trimmedEmail = formData.email.trim().toLowerCase();
 
       if (isSignUp) {
+        setLastSignupAttempt(Date.now());
         const { data: { user }, error: signUpError } = await supabase.auth.signUp({
           email: trimmedEmail,
           password: formData.password,
