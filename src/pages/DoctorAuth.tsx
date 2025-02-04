@@ -25,7 +25,6 @@ const DoctorAuth = () => {
   });
 
   const validateEmail = (email: string) => {
-    // More strict email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     const trimmedEmail = email.trim().toLowerCase();
     
@@ -33,7 +32,6 @@ const DoctorAuth = () => {
       return false;
     }
     
-    // Additional checks for common test emails
     const invalidTestDomains = ['test.com', 'example.com'];
     const domain = trimmedEmail.split('@')[1];
     if (invalidTestDomains.includes(domain)) {
@@ -77,9 +75,8 @@ const DoctorAuth = () => {
         return false;
       }
 
-      // Check rate limit for signup
       const now = Date.now();
-      if (now - lastSignupAttempt < 7000) { // 7 seconds cooldown
+      if (now - lastSignupAttempt < 7000) {
         setError("Please wait a few seconds before trying to sign up again");
         return false;
       }
@@ -91,7 +88,6 @@ const DoctorAuth = () => {
   const handleAuthError = (error: AuthError) => {
     console.error("Auth error:", error);
     
-    // Handle specific Supabase error codes
     if (error.status === 429) {
       setError("Too many attempts. Please wait a few seconds before trying again.");
       return;
@@ -116,6 +112,31 @@ const DoctorAuth = () => {
     }
     
     toast.error("Authentication failed. Please check your details.");
+  };
+
+  const createDoctorProfile = async (userId: string) => {
+    try {
+      const { error: doctorError } = await supabase
+        .from('doctors')
+        .insert([
+          {
+            user_id: userId,
+            full_name: formData.fullName,
+            specialization: formData.specialization,
+            qualification: formData.qualification,
+            experience_years: parseInt(formData.experienceYears),
+            consultation_fee: parseFloat(formData.consultationFee),
+          },
+        ]);
+
+      if (doctorError) {
+        console.error("Doctor profile creation error:", doctorError);
+        throw new Error("Failed to create doctor profile");
+      }
+    } catch (error) {
+      console.error("Error creating doctor profile:", error);
+      throw error;
+    }
   };
 
   const handleAuth = async (e: React.FormEvent) => {
@@ -151,25 +172,18 @@ const DoctorAuth = () => {
         }
 
         if (user) {
-          const { error: doctorError } = await supabase.from('doctors').insert([
-            {
-              user_id: user.id,
-              full_name: formData.fullName,
-              specialization: formData.specialization,
-              qualification: formData.qualification,
-              experience_years: parseInt(formData.experienceYears),
-              consultation_fee: parseFloat(formData.consultationFee),
-            },
-          ]);
-
-          if (doctorError) {
-            console.error("Doctor profile creation error:", doctorError);
-            setError("Failed to create doctor profile");
+          try {
+            await createDoctorProfile(user.id);
+            toast.success("Registration successful! Please check your email.");
+          } catch (error) {
+            console.error("Failed to create doctor profile:", error);
+            setError("Failed to create doctor profile. Please try again.");
+            // Sign out the user if profile creation fails
+            await supabase.auth.signOut();
+            setIsLoading(false);
             return;
           }
         }
-        
-        toast.success("Registration successful! Please check your email.");
       } else {
         const { error: signInError } = await supabase.auth.signInWithPassword({
           email: trimmedEmail,
