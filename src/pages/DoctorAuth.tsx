@@ -116,14 +116,6 @@ const DoctorAuth = () => {
 
   const createDoctorProfile = async (userId: string) => {
     try {
-      // Wait a short moment for the session to be established
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const { data: session } = await supabase.auth.getSession();
-      if (!session.session) {
-        throw new Error("No active session");
-      }
-
       const { error: doctorError } = await supabase
         .from('doctors')
         .insert([
@@ -162,7 +154,7 @@ const DoctorAuth = () => {
 
       if (isSignUp) {
         setLastSignupAttempt(Date.now());
-        const { data: { user }, error: signUpError } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
           email: trimmedEmail,
           password: formData.password,
           options: {
@@ -179,9 +171,9 @@ const DoctorAuth = () => {
           return;
         }
 
-        if (user) {
+        if (signUpData.user) {
           try {
-            await createDoctorProfile(user.id);
+            await createDoctorProfile(signUpData.user.id);
             toast.success("Registration successful! Please check your email.");
             setIsSignUp(false);
             setFormData({
