@@ -116,6 +116,14 @@ const DoctorAuth = () => {
 
   const createDoctorProfile = async (userId: string) => {
     try {
+      // Wait a short moment for the session to be established
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const { data: session } = await supabase.auth.getSession();
+      if (!session.session) {
+        throw new Error("No active session");
+      }
+
       const { error: doctorError } = await supabase
         .from('doctors')
         .insert([
@@ -131,7 +139,7 @@ const DoctorAuth = () => {
 
       if (doctorError) {
         console.error("Doctor profile creation error:", doctorError);
-        throw new Error("Failed to create doctor profile");
+        throw new Error(doctorError.message || "Failed to create doctor profile");
       }
     } catch (error) {
       console.error("Error creating doctor profile:", error);
@@ -175,13 +183,20 @@ const DoctorAuth = () => {
           try {
             await createDoctorProfile(user.id);
             toast.success("Registration successful! Please check your email.");
-          } catch (error) {
+            setIsSignUp(false);
+            setFormData({
+              email: trimmedEmail,
+              password: "",
+              fullName: "",
+              specialization: "",
+              qualification: "",
+              experienceYears: "",
+              consultationFee: "",
+            });
+          } catch (error: any) {
             console.error("Failed to create doctor profile:", error);
             setError("Failed to create doctor profile. Please try again.");
-            // Sign out the user if profile creation fails
             await supabase.auth.signOut();
-            setIsLoading(false);
-            return;
           }
         }
       } else {
