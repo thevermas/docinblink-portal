@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -116,6 +117,20 @@ const DoctorAuth = () => {
 
   const createDoctorProfile = async (userId: string) => {
     try {
+      // Wait briefly for session to be established
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Verify session exists
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError) {
+        console.error("Session error:", sessionError);
+        throw new Error("Failed to verify session");
+      }
+      
+      if (!session) {
+        throw new Error("No active session found");
+      }
+
       const { error: doctorError } = await supabase
         .from('doctors')
         .insert([
@@ -185,13 +200,14 @@ const DoctorAuth = () => {
               experienceYears: "",
               consultationFee: "",
             });
-          } catch (error) {
+          } catch (error: any) {
             console.error("Failed to create doctor profile:", error);
             setError("Failed to create doctor profile. Please try again.");
-            // Only sign out if the sign-in was successful
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
+            // Clean up by signing out if profile creation fails
+            try {
               await supabase.auth.signOut();
+            } catch (signOutError) {
+              console.error("Error signing out:", signOutError);
             }
           }
         }
