@@ -116,14 +116,6 @@ const DoctorAuth = () => {
 
   const createDoctorProfile = async (userId: string) => {
     try {
-      // Wait for session to be established
-      await new Promise(resolve => setTimeout(resolve, 2000));
-      
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        throw new Error("No active session found");
-      }
-
       const { error: doctorError } = await supabase
         .from('doctors')
         .insert([
@@ -139,7 +131,7 @@ const DoctorAuth = () => {
 
       if (doctorError) {
         console.error("Doctor profile creation error:", doctorError);
-        throw new Error(doctorError.message || "Failed to create doctor profile");
+        throw new Error(doctorError.message);
       }
     } catch (error) {
       console.error("Error creating doctor profile:", error);
@@ -193,11 +185,14 @@ const DoctorAuth = () => {
               experienceYears: "",
               consultationFee: "",
             });
-          } catch (error: any) {
+          } catch (error) {
             console.error("Failed to create doctor profile:", error);
             setError("Failed to create doctor profile. Please try again.");
-            // Sign out the user if profile creation fails
-            await supabase.auth.signOut();
+            // Only sign out if the sign-in was successful
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+              await supabase.auth.signOut();
+            }
           }
         }
       } else {
