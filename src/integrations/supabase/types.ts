@@ -75,6 +75,77 @@ export type Database = {
         }
         Relationships: []
       }
+      doctor_feedback: {
+        Row: {
+          created_at: string
+          doctor_id: string
+          id: string
+          message: string
+          patient_id: string
+        }
+        Insert: {
+          created_at?: string
+          doctor_id: string
+          id?: string
+          message: string
+          patient_id: string
+        }
+        Update: {
+          created_at?: string
+          doctor_id?: string
+          id?: string
+          message?: string
+          patient_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "doctor_feedback_doctor_id_fkey"
+            columns: ["doctor_id"]
+            isOneToOne: false
+            referencedRelation: "doctors"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      doctors: {
+        Row: {
+          consultation_fee: number
+          created_at: string
+          experience_years: number
+          full_name: string
+          id: string
+          is_available: boolean | null
+          qualification: string
+          specialization: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          consultation_fee: number
+          created_at?: string
+          experience_years: number
+          full_name: string
+          id?: string
+          is_available?: boolean | null
+          qualification: string
+          specialization: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          consultation_fee?: number
+          created_at?: string
+          experience_years?: number
+          full_name?: string
+          id?: string
+          is_available?: boolean | null
+          qualification?: string
+          specialization?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       family_members: {
         Row: {
           allergies: string | null
