@@ -73,120 +73,6 @@ export type Database = {
           symptoms?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "appointments_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doctor_availability: {
-        Row: {
-          created_at: string
-          day_of_week: number
-          doctor_id: string
-          end_time: string
-          id: string
-          start_time: string
-        }
-        Insert: {
-          created_at?: string
-          day_of_week: number
-          doctor_id: string
-          end_time: string
-          id?: string
-          start_time: string
-        }
-        Update: {
-          created_at?: string
-          day_of_week?: number
-          doctor_id?: string
-          end_time?: string
-          id?: string
-          start_time?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doctor_availability_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doctor_feedback: {
-        Row: {
-          created_at: string
-          doctor_id: string
-          id: string
-          message: string
-          patient_id: string
-          read_at: string | null
-        }
-        Insert: {
-          created_at?: string
-          doctor_id: string
-          id?: string
-          message: string
-          patient_id: string
-          read_at?: string | null
-        }
-        Update: {
-          created_at?: string
-          doctor_id?: string
-          id?: string
-          message?: string
-          patient_id?: string
-          read_at?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "doctor_feedback_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      doctors: {
-        Row: {
-          consultation_fee: number | null
-          created_at: string
-          experience_years: number | null
-          full_name: string
-          id: string
-          is_available: boolean | null
-          qualification: string | null
-          specialization: string | null
-          user_id: string
-        }
-        Insert: {
-          consultation_fee?: number | null
-          created_at?: string
-          experience_years?: number | null
-          full_name: string
-          id?: string
-          is_available?: boolean | null
-          qualification?: string | null
-          specialization?: string | null
-          user_id: string
-        }
-        Update: {
-          consultation_fee?: number | null
-          created_at?: string
-          experience_years?: number | null
-          full_name?: string
-          id?: string
-          is_available?: boolean | null
-          qualification?: string | null
-          specialization?: string | null
-          user_id?: string
-        }
         Relationships: []
       }
       family_members: {
@@ -300,15 +186,7 @@ export type Database = {
           patient_id?: string
           updated_at?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "prescriptions_doctor_id_fkey"
-            columns: ["doctor_id"]
-            isOneToOne: false
-            referencedRelation: "doctors"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       profiles: {
         Row: {
